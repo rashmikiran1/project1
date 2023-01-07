@@ -1,32 +1,36 @@
-// var title = document.getElementById("header-title");
-// console.log(title);
-// title.textContent = "hello"
-// var list = document.getElementsByClassName("list-group-item");
-// //console.log(list[0]);
-// list[3].style.backgroundColor = "green";
-// list[0].style.fontWeight = "bold";
-// list[1].style.fontWeight = "bold";
-// list[2].style.fontWeight = "bold";
+var parent = document.querySelector('#items');
+parent.parentElement.style.backgroundColor = "skyblue";
 
-//var li = document.getElementsByClassName("list-item");
-//li[0].style.backgroundColor = "red";
-var item = document.querySelector('.list-group-item:nth-child(1)');
-item.style.backgroundColor = "green";
+var child = document.querySelector('#items');
+child.firstElementChild.textContent = "hello item1";
 
-var item = document.querySelector('.list-group-item:nth-child(2)');
-item.style.color = "white";
+var child = document.querySelector('#items');
+console.log(child.firstChild);
 
-var list = document.querySelectorAll('.list-group-item');
-list[2].style.backgroundColor = "violet";
+var child = document.querySelector('#items');
+child.lastElementChild.style.backgroundColor = "yellow";
 
-var odd = document.querySelectorAll('li:nth-child(odd)');
+var sibling = document.querySelector('#items');
+console.log(sibling.nextSibling);
 
-for(i=0;i<odd.length;i++){
-    odd[i].style.backgroundColor = "green";
-}
+var sibling = document.querySelector('#items');
+console.log(sibling.previousSibling);
 
+var sibling = document.querySelector('#items');
+sibling.previousElementSibling.style.color="purple";
 
+var create = document.createElement('div');
+create.className='hello';
+create.id='hii';
+create.setAttribute('title','div created');
 
+var textnode = document.createTextNode('good day');
+create.appendChild(textnode);
+
+var container = document.querySelector('header .container');
+var h1 = document.querySelector('header h1');
+container.insertBefore(create,h1)
+//console.log(h1)
 
 
 
