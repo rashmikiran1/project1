@@ -15,6 +15,7 @@ function addItem(e){
 
   var input1 = document.getElementById('item').value;
   var input2 = document.getElementById('item1').value;
+  var input3 = document.getElementById('item2').value;
 
   // Create new li element
   var li = document.createElement('li');
@@ -23,9 +24,12 @@ function addItem(e){
 
   const node1 = document.createTextNode(input1);
   const node2 = document.createTextNode(input2);
+  const node3 = document.createTextNode(input3);
   // Add text node with input value
   li.appendChild(node1);
   li.appendChild(node2);
+  li.appendChild(node3);
+
 
   // Create del button element
   var deleteBtn = document.createElement('button');
@@ -43,14 +47,13 @@ function addItem(e){
   itemList.appendChild(li);
 
   let myobt = {
-    name : input1,
-    work : input2
+    email : input1,
+    work : input2,
+    name: input3
   }
   let myobt_serialized = JSON.stringify(myobt);
-  localStorage.setItem("myobt",myobt_serialized);
-  console.log()
-  // Get the list element from local storage
-
+  localStorage.setItem(input1,myobt_serialized);
+  
 };
 
 // Remove item
@@ -84,4 +87,7 @@ function deletelement(e){
 let list = document.getElementById("items");
 let lastItem = list.lastChild;
 list.removeChild(lastItem);
-}      
+}  
+document.write(input1);
+document.write(input2);
+document.write(input3);    
