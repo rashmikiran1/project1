@@ -13,15 +13,19 @@ filter.addEventListener('keyup', filterItems);
 function addItem(e){
   e.preventDefault();
 
-  // Get input value
-  var newItem = document.getElementById('item').value;
+  var input1 = document.getElementById('item').value;
+  var input2 = document.getElementById('item1').value;
 
   // Create new li element
   var li = document.createElement('li');
   // Add class
   li.className = 'list-group-item';
+
+  const node1 = document.createTextNode(input1);
+  const node2 = document.createTextNode(input2);
   // Add text node with input value
-  li.appendChild(document.createTextNode(newItem));
+  li.appendChild(node1);
+  li.appendChild(node2);
 
   // Create del button element
   var deleteBtn = document.createElement('button');
@@ -59,7 +63,8 @@ function filterItems(e){
   // Convert to an array
   Array.from(items).forEach(function(item){
     var itemName = item.firstChild.textContent;
-    if(itemName.toLowerCase().indexOf(text) != -1){
+    var itemName1 = item.childNodes[1].textContent;
+    if(itemName.toLowerCase().indexOf(text) != -1 || itemName1.toLowerCase().indexOf(text) != -1){
       item.style.display = 'block';
     } else {
       item.style.display = 'none';
