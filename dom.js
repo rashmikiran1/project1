@@ -41,7 +41,9 @@ function addItem(e){
 
   // Append li to list
   itemList.appendChild(li);
-  //itemList.removeChild(li);
+  localStorage.setItem(input1,input2);
+  // Get the list element from local storage
+
 }
 
 // Remove item
