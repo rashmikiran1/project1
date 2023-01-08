@@ -41,10 +41,17 @@ function addItem(e){
 
   // Append li to list
   itemList.appendChild(li);
-  localStorage.setItem(input1,input2);
+
+  let myobt = {
+    name : input1,
+    work : input2
+  }
+  let myobt_serialized = JSON.stringify(myobt);
+  localStorage.setItem("myobt",myobt_serialized);
+  console.log()
   // Get the list element from local storage
 
-}
+};
 
 // Remove item
 function removeItem(e){
