@@ -66,8 +66,8 @@ function editExpense(index) {
   
   expenseForm.addEventListener('submit', function(event) {
     event.preventDefault();
-    const newExpense = expenseInput.value.trim();
-    const newAmount = parseFloat(amountInput.value.trim());
+    const newExpense = expenseInput.value;
+    const newAmount = parseFloat(amountInput.value);
     if (newExpense !== '' && !isNaN(newAmount)) {
       addExpense(newExpense, newAmount);
       expenseForm.reset();
@@ -77,8 +77,8 @@ function editExpense(index) {
 
 expenseForm.addEventListener('submit', function(event) {
   event.preventDefault();
-  const expense = document.querySelector('#expense').value.trim();
-  const amount = parseFloat(document.querySelector('#amount').value.trim());
+  const expense = document.querySelector('#expense').value;
+  const amount = parseFloat(document.querySelector('#amount').value);
   if (expense !== '' && !isNaN(amount)) {
     addExpense(expense, amount);
     expenseForm.reset();
