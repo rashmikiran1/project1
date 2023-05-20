@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Appointment App</title>
+</head>
+<body>
+  <h1>Booking Appointment App</h1>
+
+  <div>
+    <label for="name">Name:</label>
+    <input type="text" id="name">
+  </div>
+
+  <div>
+    <label for="date">Date:</label>
+    <input type="date" id="date">
+  </div>
+
+  <div>
+    <label for="time">Time:</label>
+    <input type="time" id="time">
+  </div>
+
+  <button id="bookBtn">Book Appointment</button>
+
+  <div id="message"></div>
+
+  <h2>Users</h2>
+  <ul id="userList"></ul>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    
+    function bookAppointment() {
+      const nameInput = document.getElementById("name");
+      const dateInput = document.getElementById("date");
+      const timeInput = document.getElementById("time");
+      const messageDiv = document.getElementById("message");
+
+      const name = nameInput.value;
+      const date = dateInput.value;
+      const time = timeInput.value;
+
+      
+      if (!name || !date || !time) {
+        messageDiv.textContent = "Please fill in all fields";
+        return;
+      }
+
+    
+      const appointment = {
+        name: name,
+        date: date,
+        time: time
+      };
+
+      
+      const url = "https://crudcrud.com/api/99450cc37ca64cd394fc668726beb8a1/appointments"; 
+
+      axios.post(url, appointment)
+        .then(response => {
+          
+          messageDiv.textContent = "Appointment booked successfully";
+          
+          nameInput.value = "";
+          dateInput.value = "";
+          timeInput.value = "";
+          
+          getUsers();
+        })
+        .catch(error => {
+          
+          messageDiv.textContent = "Error booking appointment. Please try again.";
+          console.error(error);
+        });
+    }
+
+    
+    function getUsers() {
+      const url = "https://crudcrud.com/api/99450cc37ca64cd394fc668726beb8a1/appointments"; 
+
+      axios.get(url)
+        .then(response => {
+          
+          const users = response.data;
+          const userList = document.getElementById("userList");
+          userList.innerHTML = ""; 
+
+          users.forEach(user => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `Name: ${user.name}, Date: ${user.date}, time: ${user.time}`;
+  
+          const deleteButton = document.createElement("button");
+            deleteButton.textContent = "delete";
+            deleteButton.addEventListener("click", () => deleteUser(user._id)); 
+  
+            listItem.appendChild(deleteButton);
+             userList.appendChild(listItem);
+            });
+
+        })
+        .catch(error => {
+        
+          console.error(error);
+        });
+    }
+
+    function deleteUser(userId) {
+    const url = `https://crudcrud.com/api/99450cc37ca64cd394fc668726beb8a1/appointments/${userId}`;
+
+    axios.delete(url)
+    .then(response => {
+      console.log("User deleted successfully");
+      getUsers(); 
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+
+    
+    const bookButton = document.getElementById("bookBtn");
+    bookButton.addEventListener("click", bookAppointment);
+
+    
+    document.addEventListener("DOMContentLoaded", getUsers);
+  </script>
+</body>
+</html>
