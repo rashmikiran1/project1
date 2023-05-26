@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Candy</title>
+</head>
+<body>
+  <h1>Add Candy</h1>
+
+  <div>
+    <h2>Enter Candy Details</h2>
+    <form id="candyForm">
+      <label for="candyName">Candy Name:</label>
+      <input type="text" id="candyName" required>
+
+      <label for="candyPrice">Price:</label>
+      <input type="number" id="candyPrice" required>
+
+      <label for="candyDescription">Description:</label>
+      <input type="text" id="candyDescription" required>
+
+      <label for="candyQuantity">Quantity:</label>
+      <input type="number" id="candyQuantity" required>
+
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div id="candyList">
+    <h2>Candy List</h2>
+    <ul id="candyItems"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const BASE_URL = "http://localhost:4000/api/v1/product";
+    const candyForm = document.getElementById("candyForm");
+    
+
+    candyForm.addEventListener("submit", addCandy);
+
+    function addCandy(event) {
+      event.preventDefault();
+
+      const candyName = document.getElementById("candyName").value;
+      const candyPrice = document.getElementById("candyPrice").value;
+      const candyDescription = document.getElementById("candyDescription").value;
+      const candyQuantity = document.getElementById("candyQuantity").value;
+
+      const candy = {
+        name: candyName,
+        price: candyPrice,
+        description: candyDescription,
+        quantity: candyQuantity
+      };
+
+      axios.post(`${BASE_URL}/new`, candy)
+        .then(() => {
+          displayCandy(candy);
+          candyForm.reset();
+        })
+        .catch((error) => {
+          console.error("Error adding candy:", error);
+        });
+    }
+
+    function displayCandy(candy) {
+    const candyList = document.getElementById("candyItems");
+    candyItems.innerHTML = "";
+    axios
+        .get(`${BASE_URL}`)
+        .then((response) => {
+          const candyList = (response.data.products);
+          candyList.forEach((candyList) => {
+
+      const listItem = document.createElement("li");
+
+      const candyDetails = document.createElement("span");
+      candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+      listItem.appendChild(candyDetails);
+
+      const buyButton1 = document.createElement("button");
+      buyButton1.textContent = "buy1";
+      buyButton1.addEventListener("click", () => {
+        buyCandy(candy._id, 1);
+      });
+      listItem.appendChild(buyButton1);
+
+      const buyButton2 = document.createElement("button");
+      buyButton2.textContent = "buy2";
+      buyButton2.addEventListener("click", () => {
+        buyCandy(candy._id, 2);
+      });
+      listItem.appendChild(buyButton2);
+
+      candyItems.appendChild(listItem);
+    });
+})
+    .catch((error) => {
+          console.error("Error fetching candyLists:", error);
+        });
+        
+    }
+
+
+    function buyCandy(_id, quantity) {
+  axios.get(`${BASE_URL}/${_id}`)
+    .then((response) => {
+      const selectedCandy = response.data;
+
+      if (selectedCandy.quantity >= quantity) {
+        selectedCandy.quantity -= quantity;
+
+        axios.put(`${BASE_URL}/${_id}`, selectedCandy)
+          .then(() => {
+            updateCandyDetails(selectedCandy);
+          })
+          .catch((error) => {
+            console.error("Error updating candy:", error);
+          });
+      } else {
+        alert("Product Not Available");
+        return;
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching candy:", error);
+    });
+}
+
+function updateCandyDetails(candy) {
+  const candyList = document.getElementById("candyItems");
+  const listItem = candyItems.querySelector(`li[data-id="${candy._id}"]`);
+
+  if (listItem) {
+    const candyDetails = listItem.querySelector("span");
+    candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+
+    if (candy.quantity === 0) {
+      const notAvailable = document.createElement("span");
+      notAvailable.textContent = "Product Not Available";
+      listItem.appendChild(notAvailable);
+    }
+  
+        const buyButtons = listItem.querySelectorAll("button");
+        buyButtons.forEach(button => {
+          button.disabled = true;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
