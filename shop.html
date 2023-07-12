@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title >Candy</title>
+   <style>
+
+   </style>
+</head>
+<body>
+  <h1 style="color: rgb(106, 151, 8); text-align: center;">CANDY SHOP</h1>
+
+  <div>
+    <h2 style="color: rgb(217, 14, 14) ;">Enter Candy Details</h2>
+    <form id="candyForm">
+      <label for="candyName">Candy Name:</label>
+      <input type="text" id="candyName" required>
+
+      <label for="candyPrice">Price:</label>
+      <input type="number" id="candyPrice" required>
+
+      <label for="candyDescription">Description:</label>
+      <input type="text" id="candyDescription" required>
+
+      <label for="candyQuantity">Quantity:</label>
+      <input type="number" id="candyQuantity" required>
+
+      <button type="submit" id="addCandy" style="background-color: rgb(10, 1, 21) ; height: 20px ;width: 70px; color:aliceblue;">Add</button>
+      <button type="button" id="saveCandy" style="display: none; background-color: rgb(10, 1, 21) ; height: 20px ;width: 70px; color:aliceblue;">Save</button>
+    </form>
+  </div>
+
+  <div id="candyList">
+    <h2>Candy List</h2>
+    <ul id="candyItems"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const BASE_URL = "http://localhost:4000/api/v1/product";
+    const candyForm = document.getElementById("candyForm");
+    const addCandyBtn = document.getElementById("addCandy");
+    const saveCandyBtn = document.getElementById("saveCandy");
+
+    addCandyBtn.addEventListener("click", addCandy);
+    candyForm.addEventListener("submit", addCandy);
+    saveCandyBtn.addEventListener("click", saveCandy);
+
+    window.addEventListener("load", displayCandy);
+
+  async function addCandy(event) {
+  event.preventDefault();
+
+  const candyName = document.getElementById("candyName").value;
+  const candyPrice = document.getElementById("candyPrice").value;
+  const candyDescription = document.getElementById("candyDescription").value;
+  const candyQuantity = document.getElementById("candyQuantity").value;
+
+  const candy = {
+    name: candyName,
+    price: candyPrice,
+    description: candyDescription,
+    quantity: candyQuantity
+  };
+
+  try {
+    await axios.post(`${BASE_URL}/new`, candy);
+    displayCandy();
+    candyForm.reset();
+  } catch (error) {
+    console.error("Error adding candy:", error);
+  }
+}
+
+    async function displayCandy() {
+  try {
+    const candyList = document.getElementById("candyItems");
+    candyList.innerHTML = "";
+
+    const response = await axios.get(`${BASE_URL}`);
+    const candyListData = response.data.products;
+
+    candyListData.forEach((candy) => {
+      const listItem = document.createElement("li");
+      listItem.setAttribute("data-id", candy._id);
+
+      const candyDetails = document.createElement("span");
+      candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+      listItem.appendChild(candyDetails);
+
+      const buttons = document.createElement("div");
+      buttons.style.display = "flex";
+      buttons.style.justifyContent = "flex-end";
+      listItem.appendChild(buttons);
+
+      const buyButton1 = document.createElement("button");
+      buyButton1.textContent = "buy1";
+      buyButton1.addEventListener("click", () => {
+        buyCandy(candy._id, 1);
+      });
+      buttons.appendChild(buyButton1);
+      buyButton1.style.width = "100px";
+      buyButton1.style.color = "red";
+      buyButton1.style.background = "black";
+
+      const buyButton2 = document.createElement("button");
+      buyButton2.textContent = "buy2";
+      buyButton2.addEventListener("click", () => {
+        buyCandy(candy._id, 2);
+      });
+      buttons.appendChild(buyButton2);
+      buyButton2.style.width = "100px";
+      buyButton2.style.color = "red";
+      buyButton2.style.background = "black";
+      buyButton1.style.height = "30px";
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", () => {
+        editCandy(candy);
+      });
+      buttons.appendChild(editButton);
+      editButton.style.width = "100px";
+      editButton.style.color = "red";
+      editButton.style.background = "black";
+
+      candyList.appendChild(listItem);
+    });
+  } catch (error) {
+    console.error("Error fetching candyLists:", error);
+  }
+}
+
+
+    async function buyCandy(_id, quantity) {
+  try {
+    const response = await axios.get(`${BASE_URL}/${_id}`);
+    const selectedCandy = response.data.product;
+    if (selectedCandy.quantity >= quantity) {
+      selectedCandy.quantity -= quantity;
+      if (selectedCandy.quantity === 0) {
+        await axios.delete(`${BASE_URL}/${_id}`);
+        removeCandy(_id);
+      } else {
+        await axios.put(`${BASE_URL}/${_id}`, selectedCandy);
+        updateCandyDetails(selectedCandy);
+      }
+    } else {
+      alert("Product Not Available");
+      return;
+    }
+  } catch (error) {
+    console.error("Error buying candy:", error);
+  }
+}
+
+
+    function editCandy(candy) {
+      const candyId = candy._id;
+      document.getElementById("candyName").value = candy.name;
+      document.getElementById("candyPrice").value = candy.price;
+      document.getElementById("candyDescription").value = candy.description;
+      document.getElementById("candyQuantity").value = candy.quantity;
+
+      addCandyBtn.style.display = "none";
+      saveCandyBtn.style.display = "inline-block";
+      saveCandyBtn.setAttribute("data-id", candyId);
+    }
+
+    async function saveCandy() {
+  try {
+    const candyId = saveCandyBtn.getAttribute("data-id");
+    const candyName = document.getElementById("candyName").value;
+    const candyPrice = document.getElementById("candyPrice").value;
+    const candyDescription = document.getElementById("candyDescription").value;
+    const candyQuantity = document.getElementById("candyQuantity").value;
+
+    const updatedCandy = {
+      name: candyName,
+      price: candyPrice,
+      description: candyDescription,
+      quantity: candyQuantity
+    };
+
+    await axios.put(`${BASE_URL}/${candyId}`, updatedCandy);
+    displayCandy();
+    candyForm.reset();
+    addCandyBtn.style.display = "inline-block";
+    saveCandyBtn.style.display = "none";
+    saveCandyBtn.removeAttribute("data-id");
+  } catch (error) {
+    console.error("Error updating candy:", error);
+  }
+}
+
+    function updateCandyDetails(candy) {
+      const candyList = document.getElementById("candyItems");
+      const listItem = candyList.querySelector(`li[data-id="${candy._id}"]`);
+      if (listItem) {
+        const candyDetails = listItem.querySelector("span");
+        candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+      }
+    }
+
+  async function removeCandy(_id) {
+  const candyList = document.getElementById("candyItems");
+  const listItem = candyList.querySelector(`li[data-id="${_id}"]`);
+  if (listItem) {
+    try {
+      await listItem.remove();
+      console.log("Candy removed successfully.");
+    } catch (error) {
+      console.error("Error removing candy:", error);
+    }
+  }
+}
+
+
+  </script>
+</body>
+</html>

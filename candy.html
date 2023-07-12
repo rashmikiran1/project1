@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Candy</title>
+  <title >Candy</title>
 </head>
 <body>
-  <h1>Add Candy</h1>
+  <h1 style="color: rgb(9, 105, 5); text-align: center; text-decoration: solid;">CANDY SHOP</h1>
 
   <div>
-    <h2>Enter Candy Details</h2>
+    <h2 style="color: rgb(120, 6, 234)">Enter Candy Details</h2>
     <form id="candyForm">
-      <label for="candyName">Candy Name:</label>
-      <input type="text" id="candyName" required>
+      <label for="candyName">Name:</label>
+      <input type="text" id="candyName">
 
       <label for="candyPrice">Price:</label>
       <input type="number" id="candyPrice" required>
@@ -23,7 +23,8 @@
       <label for="candyQuantity">Quantity:</label>
       <input type="number" id="candyQuantity" required>
 
-      <button type="submit">Add</button>
+      <button type="submit" id="addCandy" style="background-color: rgb(10, 1, 21) ; height: 20px ;width: 70px; color:aliceblue;">Add</button>
+     
     </form>
   </div>
 
@@ -36,11 +37,12 @@
   <script>
     const BASE_URL = "http://localhost:4000/api/v1/product";
     const candyForm = document.getElementById("candyForm");
-    
-
+    const candybutton = document.getElementById("addCandy");
+    candybutton.addEventListener("click", addCandy);
     candyForm.addEventListener("submit", addCandy);
+    document.addEventListener("DOMContentLoaded", displayCandy);
 
-    function addCandy(event) {
+   async function addCandy(event) {
       event.preventDefault();
 
       const candyName = document.getElementById("candyName").value;
@@ -54,99 +56,85 @@
         description: candyDescription,
         quantity: candyQuantity
       };
-
-      axios.post(`${BASE_URL}/new`, candy)
-        .then(() => {
-          displayCandy(candy);
-          candyForm.reset();
-        })
-        .catch((error) => {
-          console.error("Error adding candy:", error);
-        });
-    }
-
-    function displayCandy(candy) {
-    const candyList = document.getElementById("candyItems");
-    candyItems.innerHTML = "";
-    axios
-        .get(`${BASE_URL}`)
-        .then((response) => {
-          const candyList = (response.data.products);
-          candyList.forEach((candyList) => {
-
-      const listItem = document.createElement("li");
-
-      const candyDetails = document.createElement("span");
-      candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
-      listItem.appendChild(candyDetails);
-
-      const buyButton1 = document.createElement("button");
-      buyButton1.textContent = "buy1";
-      buyButton1.addEventListener("click", () => {
-        buyCandy(candy._id, 1);
-      });
-      listItem.appendChild(buyButton1);
-
-      const buyButton2 = document.createElement("button");
-      buyButton2.textContent = "buy2";
-      buyButton2.addEventListener("click", () => {
-        buyCandy(candy._id, 2);
-      });
-      listItem.appendChild(buyButton2);
-
-      candyItems.appendChild(listItem);
-    });
-})
-    .catch((error) => {
-          console.error("Error fetching candyLists:", error);
-        });
-        
-    }
-
-
-    function buyCandy(_id, quantity) {
-  axios.get(`${BASE_URL}/${_id}`)
-    .then((response) => {
-      const selectedCandy = response.data;
-
-      if (selectedCandy.quantity >= quantity) {
-        selectedCandy.quantity -= quantity;
-
-        axios.put(`${BASE_URL}/${_id}`, selectedCandy)
-          .then(() => {
-            updateCandyDetails(selectedCandy);
-          })
-          .catch((error) => {
-            console.error("Error updating candy:", error);
-          });
-      } else {
-        alert("Product Not Available");
-        return;
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching candy:", error);
-    });
+ try {
+    await axios.post(`${BASE_URL}/new`, candy);
+    displayCandy();
+    candyForm.reset();
+  } catch (error) {
+    console.error("Error adding candy:", error);
+  }
 }
 
-function updateCandyDetails(candy) {
-  const candyList = document.getElementById("candyItems");
-  const listItem = candyItems.querySelector(`li[data-id="${candy._id}"]`);
+   async function displayCandy() {
+    try {
+      const candyList = document.getElementById("candyItems");
+      candyList.innerHTML = "";
+     const response = await  axios
+        .get(`${BASE_URL}`)
+        
+          const candyListData = response.data.products;
+          candyListData.forEach((candy) => {
 
-  if (listItem) {
-    const candyDetails = listItem.querySelector("span");
-    candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+            const listItem = document.createElement("li");
+            listItem.setAttribute("data-id", candy._id);
+            const candyDetails = document.createElement("span");
+            candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
+            listItem.appendChild(candyDetails);
 
-    if (candy.quantity === 0) {
-      const notAvailable = document.createElement("span");
-      notAvailable.textContent = "Product Not Available";
-      listItem.appendChild(notAvailable);
+            const buyButton1 = document.createElement("button");
+            buyButton1.textContent = "buy1";
+            buyButton1.addEventListener("click", () => {
+              buyCandy(candy._id, 1);
+            });
+            listItem.appendChild(buyButton1);
+            
+
+            const buyButton2 = document.createElement("button");
+            buyButton2.textContent = "buy2";
+            buyButton2.addEventListener("click", () => {
+              buyCandy(candy._id, 2);
+            });
+            listItem.appendChild(buyButton2);
+           
+            const buyButton3 = document.createElement("button");
+            buyButton3.textContent = "buy3";
+            buyButton3.addEventListener("click", () => {
+              buyCandy(candy._id, 3);
+            });
+            listItem.appendChild(buyButton3);
+            candyList.appendChild(listItem);
+          });
+    
+         } catch (error) {
+          console.error("Error fetching candyLists:", error);
+        };
     }
   
-        const buyButtons = listItem.querySelectorAll("button");
-        buyButtons.forEach(button => {
-          button.disabled = true;
-        });
+     async function buyCandy(_id, quantity) {
+      try {
+      const response  = await axios.get(`${BASE_URL}/${_id}`)
+          const candyid = response.data.product;
+          if (candyid.quantity >= quantity) {
+            candyid.quantity -= quantity;
+          await  axios.put(`${BASE_URL}/${_id}`, candyid)
+                updateCandyDetails(candyid);
+          } else {
+            alert("Product Not Available");
+            return;
+          }
+        
+        } catch (error) {
+          console.error("Error fetching candy:", error);
+        };
+    }
+  
+
+      function updateCandyDetails(candy) {
+      const candyList = document.getElementById("candyItems");
+      const listItem = candyList.querySelector(`li[data-id="${candy._id}"]`);
+      if (listItem) {
+        const candyDetails = listItem.querySelector("span");
+        candyDetails.textContent = `Name: ${candy.name}, Price: ${candy.price}, Description: ${candy.description}, Quantity: ${candy.quantity}`;
       }
     }
   </script>

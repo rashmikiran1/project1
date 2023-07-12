@@ -1,7 +1,7 @@
 const expenseForm = document.querySelector('form');
 const expenseTable = document.querySelector('#expense-list');
 
-let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let expenses = JSON.parse(localStorage.getItem('expenses')) || []; 
 
 function addExpense(expense, amount) {
   expenses.push({
@@ -85,4 +85,3 @@ expenseForm.addEventListener('submit', function(event) {
   }
 });
 
-  

@@ -1,80 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Appointment App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appointment App</title>
 </head>
 <body>
-  <h1>Booking Appointment App</h1>
+  <h1>Appointment App</h1>
 
   <div>
-    <label for="name">Name:</label>
-    <input type="text" id="name">
+    <h2>Book Appointment</h2>
+    <form id="appointmentForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="job">Job:</label>
+      <input type="text" id="job" required />
+
+      <button type="submit">Book</button>
+    </form>
   </div>
 
-  <div>
-    <label for="date">Date:</label>
-    <input type="date" id="date">
+  <div id="appointmentList">
+    <h2>Appointments</h2>
+    <ul id="userList"></ul>
   </div>
-
-  <div>
-    <label for="time">Time:</label>
-    <input type="time" id="time">
-  </div>
-
-  <button id="bookBtn">Book Appointment</button>
-
-  <div id="message"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-    
-    function bookAppointment() {
-      const nameInput = document.getElementById("name");
-      const dateInput = document.getElementById("date");
-      const timeInput = document.getElementById("time");
-      const messageDiv = document.getElementById("message");
+    const BASE_URL = "http://localhost:4000/api/v1/product";
 
-      const name = nameInput.value;
-      const date = dateInput.value;
-      const time = timeInput.value;
+    function getAppointments() {
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
 
-      
-      if (!name || !date || !time) {
-        messageDiv.textContent = "Please fill in all fields";
-        return;
-      }
+      axios
+        .get(`${BASE_URL}`)
+        .then((response) => {
+          const appointments = response.data.products;
+          appointments.forEach((appointment) => {
+            const listItem = document.createElement("li");
 
-      
-      const appointment = {
-        name: name,
-        date: date,
-        time: time
-      };
+            const nameText = document.createElement("span");
+            nameText.textContent = `Name: ${appointment.name}, `;
+            listItem.appendChild(nameText);
 
-      
-      const url = "https://crudcrud.com/api/5565be1d32bf49f6a600884fcdabd74c/appointments"; 
+            const jobText = document.createElement("span");
+            jobText.textContent = `Job: ${appointment.job}, `;
+            listItem.appendChild(jobText);
 
-      axios.post(url, appointment)
-        .then(response => {
-          
-          messageDiv.textContent = "Appointment booked successfully";
-          
-          nameInput.value = "";
-          dateInput.value = "";
-          timeInput.value = "";
+            const editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => {
+              editAppointment(appointment._id, appointment);
+            });
+            listItem.appendChild(editButton);
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => {
+              deleteAppointment(appointment._id);
+            });
+            listItem.appendChild(deleteButton);
+
+            userList.appendChild(listItem);
+          });
         })
-        .catch(error => {
-          
-          messageDiv.textContent = "Error booking appointment. Please try again.";
-          console.error(error);
+        .catch((error) => {
+          console.error("Error fetching appointments:", error);
         });
     }
 
-    
-    const bookButton = document.getElementById("bookBtn");
-    bookButton.addEventListener("click", bookAppointment);
+    function bookAppointment(event) {
+      event.preventDefault();
+
+      const nameInput = document.getElementById("name");
+      const jobInput = document.getElementById("job");
+
+      const name = nameInput.value;
+      const job = jobInput.value;
+
+      const appointment = { name, job };
+
+      axios
+        .post(`${BASE_URL}/new`, appointment)
+        .then(() => {
+          nameInput.value = "";
+          jobInput.value = "";
+          getAppointments();
+        })
+        .catch((error) => {
+          console.error("Error booking appointment:", error);
+        });
+    }
+
+    let currentEditedAppointmentId = null; // Track the currently edited appointment ID
+
+function editAppointment(_id, initialData) {
+  const nameInput = document.getElementById("name");
+  const jobInput = document.getElementById("job");
+
+  nameInput.value = initialData.name;
+  jobInput.value = initialData.job;
+
+  const form = document.getElementById("appointmentForm");
+
+  // Remove the existing edit button, if any
+  const existingSaveButton = form.querySelector("button[data-action='edit']");
+  if (existingSaveButton) {
+    existingSaveButton.remove();
+  }
+
+  // Append the new edit button
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Edit";
+  saveButton.setAttribute("data-action", "edit");
+  saveButton.addEventListener("click", () => {
+    saveChanges(_id);
+  });
+  form.appendChild(saveButton);
+
+  // Update the currently edited appointment ID
+  currentEditedAppointmentId = _id;
+}
+
+function saveChanges(_id) {
+  if (_id !== currentEditedAppointmentId) {
+    return; // Prevent saving changes for an outdated appointment
+  }
+
+  const form = document.getElementById("appointmentForm");
+  const nameInput = document.getElementById("name");
+  const jobInput = document.getElementById("job");
+
+  const newName = nameInput.value;
+  const newJob = jobInput.value;
+
+  if (newName && newJob) {
+    const updatedAppointment = { name: newName, job: newJob };
+
+    axios
+      .put(`${BASE_URL}/${_id}`, updatedAppointment)
+      .then(() => {
+        nameInput.value = "";
+        jobInput.value = "";
+        getAppointments();
+        currentEditedAppointmentId = null; // Reset the currently edited appointment ID
+      })
+      .catch((error) => {
+        console.error("Error updating appointment:", error);
+      });
+  }
+}
+
+
+
+    function deleteAppointment(_id) {
+  axios
+    .delete(`${BASE_URL}/${_id}`)
+    .then((response) => {
+      if (response.status === 200) {
+        console.log("Appointment deleted successfully");
+        getAppointments();
+      } else {
+        console.log("Error deleting appointment:", response.status);
+      }
+    })
+    .catch((error) => {
+      console.error("Error deleting appointment:", error);
+    });
+}
+
+
+    const appointmentForm = document.getElementById("appointmentForm");
+    appointmentForm.addEventListener("submit", bookAppointment);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      getAppointments();
+    });
   </script>
 </body>
 </html>

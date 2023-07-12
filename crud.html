@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>Axios Crash Course</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="container my-5">
+      <div class="text-center">
+        <h1 class="display-4 text-center mb-3">Axios Crash Course</h1>
+        <button class="btn btn-primary my-3" id="get">GET</button>
+        <button class="btn btn-info" id="post">POST</button>
+        <button class="btn btn-warning" id="update">PUT/PATCH</button>
+        <button class="btn btn-danger" id="delete">DELETE</button>
+        <button class="btn btn-secondary" id="sim">Sim Requests</button>
+        <button class="btn btn-secondary" id="headers">
+          Custom Headers
+        </button>
+        <button class="btn btn-secondary" id="transform">
+          Transform
+        </button>
+        <button class="btn btn-secondary" id="error">
+          Error Handling
+        </button>
+        <button class="btn btn-secondary" id="cancel">
+          Cancel
+        </button>
+      </div>
+      <hr />
+      <div id="res"></div>
+    </div>
+    <script>
+      const BASE_URL = "http://localhost:4000/api/v1/product";
+
+      // GET REQUEST
+      function getTodos() {
+        axios
+          .get(`${BASE_URL}`)
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('GET Request');
+      }
+
+      // POST REQUEST
+      function addTodo() {
+        axios
+          .post(`${BASE_URL}/new`, { name: "priya", job: "sde" })
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('POST Request');
+      }
+
+      // PUT/PATCH REQUEST
+      function updateTodo() {
+        const todoId = '646d0174596baf2af85f080e'; // Replace with the actual ID of the todo item to update
+        axios
+          .put(`${BASE_URL}/${todoId}`, { name: "priyanka" })
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('PUT/PATCH Request');
+      }
+
+      // DELETE REQUEST
+      function removeTodo() {
+        const todoId = '646d00ee596baf2af85f080b';
+        axios
+          .delete(`${BASE_URL}/${todoId}`)
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('DELETE Request');
+      }
+
+      // SIMULTANEOUS DATA
+      function getData() {
+        // Perform multiple requests simultaneously
+        axios
+          .all([
+            axios.get(`${BASE_URL}`),
+            axios.get(`${BASE_URL}`),
+          ])
+          .then(axios.spread((todosResponse, usersResponse) => {
+            // Handle responses for todos and users separately
+            showOutput(todosResponse);
+            showOutput(usersResponse);
+          }))
+          .catch((error) => console.error(error));
+        console.log('Simultaneous Request');
+      }
+
+      // CUSTOM HEADERS
+      function customHeaders() {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer YOUR_ACCESS_TOKEN', // Replace with your actual access token
+          },
+        };
+
+        axios
+          .get(`${BASE_URL}`, config)
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('Custom Headers');
+      }
+
+      // TRANSFORMING REQUESTS & RESPONSES
+      function transformResponse() {
+        const config = {
+          transformRequest: axios.defaults.transformRequest.concat((data, headers) => {
+            // Modify the request data and headers
+            headers['X-Custom-Header'] = 'Custom Value';
+            return data;
+          }),
+          transformResponse: axios.defaults.transformResponse.concat((data) => {
+            // Modify the response data
+            if (typeof data === 'object') {
+              data.modified = true;
+            }
+            return data;
+          }),
+        };
+
+        axios
+          .get(`${BASE_URL}`, config)
+          .then((response) => showOutput(response))
+          .catch((error) => console.error(error));
+        console.log('Transform Response');
+      }
+
+      // ERROR HANDLING
+      function errorHandling() {
+        axios
+          .get(`${BASE_URL}`)
+          .then((response) => showOutput(response))
+          .catch((error) => {
+            if (error.response) {
+              // Request was made and server responded with a status code
+              console.error('Status:', error.response.status);
+              console.error('Data:', error.response.data);
+              console.error('Headers:', error.response.headers);
+            } else if (error.request) {
+              // Request was made but no response was received
+              console.error('Request:', error.request);
+            } else {
+              // Something else happened while setting up the request
+              console.error('Error:', error.message);
+            }
+          });
+        console.log('Error Handling');
+      }
+
+      // CANCEL TOKEN
+      function cancelToken() {
+        const source = axios.CancelToken.source();
+
+        axios
+          .get(`${BASE_URL}`, { cancelToken: source.token })
+          .then((response) => showOutput(response))
+          .catch((error) => {
+            if (axios.isCancel(error)) {
+              console.log('Request canceled:', error.message);
+            } else {
+              console.error(error);
+            }
+          });
+
+        // Cancel the request (e.g., on button click)
+        source.cancel('Request canceled');
+        console.log('Cancel Token');
+      }
+
+      // INTERCEPTING REQUESTS & RESPONSES
+      axios.interceptors.request.use((config) => {
+        console.log('Request Interceptor:', config);
+        // You can modify the request config before it is sent
+        return config;
+      });
+
+      axios.interceptors.response.use((response) => {
+        console.log('Response Interceptor:', response);
+        // You can modify the response data before it is resolved
+        return response;
+      }, (error) => {
+        console.error('Response Error Interceptor:', error);
+        // Handle the error
+        return Promise.reject(error);
+      });
+
+      // AXIOS INSTANCES
+      const instance = axios.create({
+        baseURL: BASE_URL,
+        // You can customize the instance's config
+      });
+
+      // Show output in browser
+      function showOutput(res) {
+        document.getElementById('res').innerHTML = `
+          <div class="card card-body mb-4">
+            <h5>Status: ${res.status}</h5>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header">
+              Headers
+            </div>
+            <div class="card-body">
+              <pre>${JSON.stringify(res.headers, null, 2)}</pre>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header">
+              Data
+            </div>
+            <div class="card-body">
+              <pre>${JSON.stringify(res.data, null, 2)}</pre>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header">
+              Config
+            </div>
+            <div class="card-body">
+              <pre>${JSON.stringify(res.config, null, 2)}</pre>
+            </div>
+          </div>
+        `;
+      }
+
+      // Event listeners
+      document.getElementById('get').addEventListener('click', getTodos);
+      document.getElementById('post').addEventListener('click', addTodo);
+      document.getElementById('update').addEventListener('click', updateTodo);
+      document.getElementById('delete').addEventListener('click', removeTodo);
+      document.getElementById('sim').addEventListener('click', getData);
+      document.getElementById('headers').addEventListener('click', customHeaders);
+      document.getElementById('transform').addEventListener('click', transformResponse);
+      document.getElementById('error').addEventListener('click', errorHandling);
+      document.getElementById('cancel').addEventListener('click', cancelToken);
+    </script>
+  </body>
+</html>

@@ -14,13 +14,8 @@
   </div>
 
   <div>
-    <label for="date">Date:</label>
-    <input type="date" id="date">
-  </div>
-
-  <div>
-    <label for="time">Time:</label>
-    <input type="time" id="time">
+    <label for="job">Job:</label>
+    <input type="text" id="job">
   </div>
 
   <button id="bookBtn">Book Appointment</button>
@@ -35,16 +30,14 @@
     
     function bookAppointment() {
       const nameInput = document.getElementById("name");
-      const dateInput = document.getElementById("date");
-      const timeInput = document.getElementById("time");
+      const jobInput = document.getElementById("job");
       const messageDiv = document.getElementById("message");
 
       const name = nameInput.value;
-      const date = dateInput.value;
-      const time = timeInput.value;
+      const job = jobInput.value;
 
       
-      if (!name || !date || !time) {
+      if (!name || !job ) {
         messageDiv.textContent = "Please fill in all fields";
         return;
       }
@@ -52,12 +45,12 @@
     
       const appointment = {
         name: name,
-        date: date,
-        time: time
+        job: job
+        
       };
 
       
-      const url = "https://crudcrud.com/api/99450cc37ca64cd394fc668726beb8a1/appointments"; 
+      const url = "http://localhost:4000/api/v1/product/new"; 
 
       axios.post(url, appointment)
         .then(response => {
@@ -65,8 +58,8 @@
           messageDiv.textContent = "Appointment booked successfully";
           
           nameInput.value = "";
-          dateInput.value = "";
-          timeInput.value = "";
+          jobInput.value = "";
+        
           
           getUsers();
         })
@@ -79,26 +72,53 @@
 
     
     function getUsers() {
-      const url = "https://crudcrud.com/api/99450cc37ca64cd394fc668726beb8a1/appointments"; 
+  const url = "http://localhost:4000/api/v1/product";
 
-      axios.get(url)
-        .then(response => {
-          
-          const users = response.data;
-          const userList = document.getElementById("userList");
-          userList.innerHTML = ""; 
+  axios.get(url)
+    .then(response => {
+      const users = response.data;
 
-          users.forEach(user => {
-            const listItem = document.createElement("li");
-            listItem.textContent = `Name: ${user.name}, Date: ${user.date}, time: ${user.time}`;
-            userList.appendChild(listItem);
-          });
-        })
-        .catch(error => {
-        
-          console.error(error);
-        });
-    }
+      console.log(users); // Log the response data to inspect its structure
+
+      if (!Array.isArray(users)) {
+        console.error("Invalid response data. Expected an array.");
+        return;
+      }
+
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
+
+      users.forEach(user => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `Name: ${user.name}, Job: ${user.job}`;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "delete";
+        deleteButton.addEventListener("click", () => deleteUser(user._id));
+
+        listItem.appendChild(deleteButton);
+        userList.appendChild(listItem);
+      });
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+
+    function deleteUser(userId) {
+    const url = `http://localhost:4000/api/v1/product/${userId}`;
+
+    axios.delete(url)
+    .then(response => {
+      console.log("User deleted successfully");
+      getUsers(); 
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
 
     
     const bookButton = document.getElementById("bookBtn");
