@@ -1,0 +1,12 @@
+.form {
+    width:500px;
+    height:auto;
+    background-color: bisque;
+    align-items: end;
+    padding: 30px;
+    display: flex;
+    margin: 50px;
+}
+.formtitle {
+  height: 0%;
+}

@@ -2,6 +2,7 @@ import './expense.css';
 import ExpenseDate from './ExpenseeDate';
 import ExpenseDetails from './ExpenseDetails';
 import { useState } from 'react';
+import ExpenseForm from '../ExpenseForm';
 const Expense= (props) => {
 const [amount,setAmount] = useState(props.amount)
 const clickHandler = () => {
