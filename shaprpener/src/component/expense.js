@@ -1,11 +1,11 @@
 import './expense.css';
-function Expense() {
-    const expenseDate = new Date(21,3,2023)
-    const location = window.location.hostname;
+function Expense(props) {
     return (
       <div className="expend">
-       <h1>{expenseDate.toISOString()}</h1> 
-       <h2>{location}</h2>
+       <div>{props.location}</div>
+       <div>{props.title}</div>
+       <div>{props.amount}</div>
+       <div>{props.date.toISOString()}</div>
       </div>
     );
   }

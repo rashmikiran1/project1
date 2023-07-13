@@ -1,4 +1,10 @@
 .expend {
     display: flex;
     justify-content: space-between;
+    box-sizing:border-box;
+    margin: 10px;
+    height: 50px;
+    background-color: #f2eded;
+    border-radius: 10px;
+    align-items: center;
 }
