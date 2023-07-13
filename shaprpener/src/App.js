@@ -1,5 +1,5 @@
 import React from 'react';
-import Expense from './component/expense';
+import Expense from './component/expenses/expense';
 const expenses = [
   { location:'patna', title: 'Food', amount: 50, date:new Date(2021,4,5)},
   { location: 'delhi', title: 'Transportation', amount: 30, date:new Date(2023,4,5)},
