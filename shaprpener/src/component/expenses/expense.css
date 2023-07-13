@@ -1,14 +1,32 @@
 .expend {
-    margin: 10px;
+    margin: 20px 0 20px 0;
+    display: flex;
+   justify-content: space-between;
+    flex-direction: row;
     height: auto;
     width:100%;
     background-color: #f2eded;
     border-radius: 10px;
     align-items: center;
+
 }
 
 .details {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-evenly;
+    flex-direction: row;
+    justify-content: center;
+    padding: 20px;
+}
+
+.date {
+    height: auto;
+    width:100px;
+    background-color: rgb(75, 61, 84);
+    align-items: center;
+    margin-left: 10px;
+    border-radius: 10px;
+    color: #f3efef;
+}
+.title {
+    margin-right: 150px;
 }

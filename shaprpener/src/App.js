@@ -1,13 +1,14 @@
 import React from 'react';
 import Expense from './component/expenses/expense';
 const expenses = [
-  { location:'patna', title: 'Food', amount: 50, date:new Date(2021,4,5)},
-  { location: 'delhi', title: 'Transportation', amount: 30, date:new Date(2023,4,5)},
-  { location: 'mumbai', title: 'Accommodation', amount: 100, date:new Date(2022,4,5)}
+  { location:'patna', title: 'Food', amount: 50, date:new Date(2021,10,5)},
+  { location: 'delhi', title: 'Rent', amount: 30, date:new Date(2023,9,5)},
+  { location: 'mumbai', title: 'Travel', amount: 100, date:new Date(2022,5,5)}
 ];
 function App() {
   return (
     <div>
+      <h1>Expense Tracker</h1>
      {expenses.map((expense, index) => (
         <Expense
           key={index}
