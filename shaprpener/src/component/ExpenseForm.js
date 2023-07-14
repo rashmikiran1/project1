@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import "../component/form.css";
 
-function ExpenseForm() {
+function ExpenseForm(props) {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
-  const [submittedExpense, setSubmittedExpense] = useState(null);
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -26,7 +25,10 @@ function ExpenseForm() {
       date: new Date(date),
       amount: amount,
     };
-    setSubmittedExpense(expenseData);
+    props.onAddExpense(expenseData);
+    setTitle("");
+    setDate("");
+    setAmount("");
   };
 
   return (
@@ -48,15 +50,6 @@ function ExpenseForm() {
           <button type="submit">ADD</button>
         </div>
       </form>
-
-      {submittedExpense && (
-        <div className="submitted-expense">
-          <h2>Expense</h2>
-          <p>Title: {submittedExpense.title}</p>
-          <p>Date: {submittedExpense.date.toString()}</p>
-          <p>Amount: {submittedExpense.amount}</p>
-        </div>
-      )}
     </div>
   );
 }
