@@ -6,7 +6,7 @@ const Expense= (props) => {
 
     return (
       <div className="expend">
-        
+        {props.filteredExpenses}
         <div>
         <ExpenseDate date={props.date}  filteredYear={props.filteredYear} />
         </div>

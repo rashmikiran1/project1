@@ -13,13 +13,18 @@ function App() {
   const addExpenseHandler = (expense) => {
     setExpenses((prevExpenses) => [...prevExpenses, expense]);
   };
+  const filteredExpenses = expenses.filter((expense) => {
+    return expense.date.getFullYear().toString() === filteredYear;
+  });
 
   return (
     <div>
       <h1>Expense Tracker</h1>
       <ExpenseForm onAddExpense={addExpenseHandler} />
       <ExpenseFilter selected={filteredYear} onChangeFilter ={filterhandler} />
-      {expenses.map((expense, index) => (
+      {filteredExpenses.length===0 && <p>no expenses found</p>}
+      {filteredExpenses.length > 0 && 
+      filteredExpenses.map((expense, index) => (
         <Expense
           key={index}
           title={expense.title}
