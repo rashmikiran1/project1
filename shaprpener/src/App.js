@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import Expense from './component/expenses/expense';
 import ExpenseForm from './component/ExpenseForm';
 import ExpenseFilter from './component/expenses/ExpenseFilter';
+import ExpenseChart from './component/expenses/expenseChart';
 
 function App() {
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [filteredYear, setFilteredYear] = useState('2020');
+  const [filteredYear, setFilteredYear] = useState('2023');
 
   const filterHandler = (selectedYear) => {
     setFilteredYear(selectedYear);
@@ -18,17 +19,20 @@ function App() {
   };
 
   const toggleFormHandler = () => {
-    setShowForm((prevShowForm) => !prevShowForm); // Toggle the showForm state on button click
+    setShowForm((prevShowForm) => !prevShowForm); 
   };
 
-  // Filter the expenses based on the selected year
   const filteredExpenses = expenses.filter((expense) => {
-    return expense.date.getFullYear().toString() === filteredYear;
+    const expenseYear = expense.date.getFullYear().toString();
+    return expenseYear === filteredYear;
   });
+  
 
   return (
     <div>
       <h1>Expense Tracker</h1>
+      <ExpenseChart expenses={filteredExpenses} />
+
       {showForm ? (
         <ExpenseForm onAddExpense={addExpenseHandler} />
       ) : (
@@ -36,8 +40,7 @@ function App() {
       )}
       {showForm && <ExpenseFilter selected={filteredYear} onChangeFilter={filterHandler} />}
       {showForm && filteredExpenses.length === 0 && <p>No expenses found for the selected year.</p>}
-      {showForm &&
-        filteredExpenses.map((expense, index) => (
+      {filteredExpenses.map((expense, index) => (
           <Expense
             key={index}
             title={expense.title}
@@ -45,7 +48,7 @@ function App() {
             date={expense.date}
             filteredYear={filteredYear}
           />
-        ))}
+        ))}        
     </div>
   );
 }
